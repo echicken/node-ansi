@@ -10,4 +10,6 @@ fs.writeFileSync(
 	{ 'encoding' : 'binary' }
 );
 fs.writeFileSync("gnome.bin", a.binary.data);
+console.log("Binary graphic width: %d", a.binary.width);
 a.toGIF({ 'filename' : "gnome.gif", 'loop' : false });
+a.toPNG("gnome.png");
