@@ -330,12 +330,22 @@ var ANSI = function() {
 		var encoder = new GIFEncoder(720, 384);
 		encoder.createReadStream().pipe(fs.createWriteStream(options.filename));
 		encoder.start();
-		encoder.setRepeat((typeof options.loop != "boolean" || !options.loop) ? -1 : 0); // 0 for repeat, -1 for no-repeat
-		encoder.setDelay((typeof options.delay != "number") ? 50 : Math.round(options.delay));
-		encoder.setQuality((typeof options.quality != "number") ? 1 : Math.min(10, options.quality));
+		encoder.setRepeat(
+			(typeof options.loop != "boolean" || !options.loop) ? -1 : 0
+		);
+		encoder.setDelay(
+			(typeof options.delay != "number")
+				? 40 : Math.round(options.delay)
+		);
+		encoder.setQuality(
+			(typeof options.quality != "number")
+				? 20 : Math.min(20, options.quality)
+		);
 
 		var canvas = new ansiCanvas();
-		var frames = (typeof options.frames != "number") ? 20 : Math.round(options.frames);
+		var frames =
+			(typeof options.charactersPerFrame != "number")
+				? 10 : Math.round(options.charactersPerFrame);
 
 		for(var d = 0; d < self.data.length; d++) {
 			if(self.data[d].chr.match(/\r|\n/) !== null)
@@ -356,6 +366,8 @@ var ANSI = function() {
 
 }
 
+// Lazily ported and modified from my old HTML5 ANSI editor
+// Could be simplified and folded into ANSI.toGIF() at some point
 var ansiCanvas = function() {
 
 	var foregroundCanvas, foregroundContext, backgroundCanvas, backgroundContext, mergeContext;
