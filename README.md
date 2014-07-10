@@ -71,6 +71,9 @@ a.toGIF({ 'filename' : "gnome.gif", 'loop' : false });
 			- The image quality, on a scale of 1 to 20, where 1 is best and 20 is worst
 				- I haven't noticed a visible difference between 1 and 20
 				- GIFs generate a lot faster when the quality is set to the lowest (yet highest-numbered) value
+- **toPNG(filename)**
+	- Converts the loaded ANSI graphic to a PNG, and saves it to a file
+	- *filename* is the path to the file to save in
 
 #####Properties
 
@@ -127,7 +130,7 @@ a.toGIF({ 'filename' : "gnome.gif", 'loop' : false });
 		- **width** (number)
 			- The width of the binary graphic
 		- **data** (Buffer)
-			- A buffer of [ chr, attr, chr, attr, ... ] uints
+			- A buffer of [ chr, attr, chr, attr, ... ] uint8s
 
 - **HTML**
 	- An HTML &lt;pre&gt; block containing the graphic, with colorized regions in styled &lt;span&gt; elements, and characters encoded as HTML entities as required
