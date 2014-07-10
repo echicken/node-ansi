@@ -8,7 +8,7 @@ var copyObject = function(obj) {
 		if(Array.isArray(obj[property]))
 			ret[property] = obj[property];
 		else if(typeof obj[property] == "object")
-			ret[property] = copy(obj[property]);
+			ret[property] = copyObject(obj[property]);
 		else if(typeof obj[property] != "undefined")
 			ret[property] = obj[property];
 	return ret;
@@ -136,12 +136,30 @@ var ANSI = function() {
 						break;
 					case 'J':
 						if(opts.length == 1 && opts[0] == 2) {
-							for(var d in this.data) {
+						/*	for(var d in this.data) {
 								var o = copyObject(this.data[d]);
 								o.chr = " ";
 								this.data.push(o);
 								cursor.y = 0;
 								cursor.x = 0;
+							} */
+							for(var y = 0; y < 24; y++) {
+								for(var x = 0; x < 79; x++) {
+									this.data.push(
+										{	'cursor' : {
+												'x' : x,
+												'y' : y
+											},
+											'graphics' : {
+												'bright' : false,
+												'blink' : false,
+												'foreground' : 37,
+												'background' : 40
+											},
+											'chr' : " "
+										}
+									);
+								}
 							}
 						}
 						break;
