@@ -1,0 +1,25 @@
+{	"name" : "ansi-graphics",
+	"version" : "1.1.0",
+	"license" : "BSD-3-Clause",
+	"description" : "An ANSI graphics parser.",
+	"author" : {
+		"name" : "echicken",
+		"email" : "echicken@bbs.electronicchicken.com"
+	},
+	"main" : "./ansi.js",
+	"repository" : {
+		"type" : "git",
+		"url" : "https://github.com/echicken/node-ansi.git"
+	},
+	"engines" : {
+		"node" : ">= 0.10.24"
+	},
+	"keywords" : [
+		"ansi",
+		"graphics",
+		"ascii",
+		"bbs",
+		"art",
+		"textmode"
+	]
+}
