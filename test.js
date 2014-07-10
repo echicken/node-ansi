@@ -1,7 +1,7 @@
 var ANSI = require('./ansi.js'),
 	fs = require('fs');
 
-var a = new ANSI();
+var a = new ANSI.ANSI();
 a.fromFile("./gnome.ans");
 fs.writeFileSync("gnome.txt", a.plainText, { 'encoding' : 'binary' });
 fs.writeFileSync(

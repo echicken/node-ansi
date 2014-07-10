@@ -305,4 +305,5 @@ var ANSI = function() {
 
 }
 
-module.exports = ANSI;
+module.exports.ANSI = ANSI;
+module.exports.defs = defs;
