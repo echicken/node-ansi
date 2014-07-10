@@ -324,28 +324,33 @@ var ANSI = function() {
 		}
 	);
 
-	this.toGIF = function(options) {
+	var toGraphic = function(options) {
 		var matrix = self.matrix;
 
-		var encoder = new GIFEncoder(720, 384);
-		encoder.createReadStream().pipe(fs.createWriteStream(options.filename));
-		encoder.start();
-		encoder.setRepeat(
-			(typeof options.loop != "boolean" || !options.loop) ? -1 : 0
-		);
-		encoder.setDelay(
-			(typeof options.delay != "number")
-				? 40 : Math.round(options.delay)
-		);
-		encoder.setQuality(
-			(typeof options.quality != "number")
-				? 20 : Math.min(20, options.quality)
-		);
+		if(typeof options.filename != "string")
+			throw "ANSI: toGraphic: options.filename must be specified, must be string.";
+
+		if(options.GIF) {
+			var encoder = new GIFEncoder(720, 384);
+			encoder.createReadStream().pipe(fs.createWriteStream(options.filename));
+			encoder.start();
+			encoder.setRepeat(
+				(typeof options.loop != "boolean" || !options.loop) ? -1 : 0
+			);
+			encoder.setDelay(
+				(typeof options.delay != "number")
+					? 40 : Math.round(options.delay)
+			);
+			encoder.setQuality(
+				(typeof options.quality != "number")
+					? 20 : Math.min(20, options.quality)
+			);
+			var frames =
+				(typeof options.charactersPerFrame != "number")
+					? 10 : Math.round(options.charactersPerFrame);
+		}
 
 		var canvas = new ansiCanvas();
-		var frames =
-			(typeof options.charactersPerFrame != "number")
-				? 10 : Math.round(options.charactersPerFrame);
 
 		for(var d = 0; d < self.data.length; d++) {
 			if(self.data[d].chr.match(/\r|\n/) !== null)
@@ -357,11 +362,30 @@ var ANSI = function() {
 				defs.Attributes[self.data[d].graphics.foreground].attribute|((self.data[d].graphics.bright)?defs.Attributes[1].attribute:0),
 				(defs.Attributes[self.data[d].graphics.background].attribute>>4)
 			);
-			if(d % frames == 0)
+			if(options.GIF && d % frames == 0)
 				encoder.addFrame(canvas.context);
 		}
-		encoder.addFrame(canvas.context);
-		encoder.finish();
+		if(options.GIF) {
+			encoder.addFrame(canvas.context);
+			encoder.finish();
+		}
+		if(options.PNG)
+			fs.writeFileSync(options.filename, canvas.canvas.toBuffer());
+	}
+
+	this.toGIF = function(options) {
+		options.GIF = true;
+		options.PNG = false;
+		toGraphic(options);
+	}
+
+	this.toPNG = function(filename) {
+		toGraphic(
+			{	'GIF' : false,
+				'PNG' : true,
+				'filename' : filename
+			}
+		);
 	}
 
 }
@@ -370,7 +394,21 @@ var ANSI = function() {
 // Could be simplified and folded into ANSI.toGIF() at some point
 var ansiCanvas = function() {
 
-	var foregroundCanvas, foregroundContext, backgroundCanvas, backgroundContext, mergeContext;
+	var foregroundCanvas,
+		foregroundContext,
+		backgroundCanvas,
+		backgroundContext,
+		mergeCanvas,
+		mergeContext;
+
+	this.__defineGetter__(
+		"canvas",
+		function() {
+			mergeContext.drawImage(backgroundCanvas, 0, 0);
+			mergeContext.drawImage(foregroundCanvas, 0, 0);
+			return mergeCanvas;
+		}
+	);
 
 	this.__defineGetter__(
 		"context",
@@ -425,6 +463,8 @@ var ansiCanvas = function() {
 
 		backgroundCanvas = new Canvas(720, 384);
 		backgroundContext = backgroundCanvas.getContext('2d');
+		backgroundContext.fillStyle = properties.colors[0];
+		backgroundContext.fillRect(0, 0, 720, 384);
 
 		foregroundCanvas = new Canvas(720, 384);
 		foregroundContext = foregroundCanvas.getContext('2d');
