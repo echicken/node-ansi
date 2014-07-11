@@ -366,6 +366,7 @@ var ANSI = function() {
 				encoder.addFrame(canvas.context);
 		}
 		if(options.GIF) {
+			encoder.setDelay(10000); // Dwell on the last frame for a while.  Make configurable?
 			encoder.addFrame(canvas.context);
 			encoder.finish();
 		}
