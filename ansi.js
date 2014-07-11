@@ -1,9 +1,10 @@
 var util = require('util'),
 	fs = require('fs'),
-	defs = require('./defs.js'),
 	Canvas = require('canvas'),
 	Image = Canvas.Image,
-	GIFEncoder = require('gifencoder');
+	GIFEncoder = require('gifencoder'),
+	defs = require('./defs.js');
+;
 
 var copyObject = function(obj) {
 	var ret = {};
@@ -327,12 +328,9 @@ var ANSI = function() {
 	var toGraphic = function(options) {
 		var matrix = self.matrix;
 
-		if(typeof options.filename != "string")
-			throw "ANSI: toGraphic: options.filename must be specified, must be string.";
-
 		if(options.GIF) {
 			var encoder = new GIFEncoder(720, 384);
-			encoder.createReadStream().pipe(fs.createWriteStream(options.filename));
+			var rs = encoder.createReadStream();
 			encoder.start();
 			encoder.setRepeat(
 				(typeof options.loop != "boolean" || !options.loop) ? -1 : 0
@@ -368,24 +366,22 @@ var ANSI = function() {
 		if(options.GIF) {
 			encoder.addFrame(canvas.context);
 			encoder.finish();
+			return rs.read();
 		}
 		if(options.PNG)
-			fs.writeFileSync(options.filename, canvas.canvas.toBuffer());
+			return canvas.canvas.toBuffer();
 	}
 
 	this.toGIF = function(options) {
+		if(typeof options != "object")
+			options = {};
 		options.GIF = true;
 		options.PNG = false;
-		toGraphic(options);
+		return toGraphic(options);
 	}
 
 	this.toPNG = function(filename) {
-		toGraphic(
-			{	'GIF' : false,
-				'PNG' : true,
-				'filename' : filename
-			}
-		);
+		return toGraphic({ 'GIF' : false, 'PNG' : true });
 	}
 
 }
