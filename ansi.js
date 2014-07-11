@@ -1,9 +1,10 @@
 var util = require('util'),
 	fs = require('fs'),
-	defs = require('./defs.js'),
 	Canvas = require('canvas'),
 	Image = Canvas.Image,
-	GIFEncoder = require('gifencoder');
+	GIFEncoder = require('gifencoder'),
+	defs = require('./defs.js');
+;
 
 var copyObject = function(obj) {
 	var ret = {};
@@ -33,6 +34,9 @@ var ANSI = function() {
 
 	var self = this;
 	this.data = [];
+
+	var width = 0;
+	var height = 0;
 
 	this.fromString = function(ansiString) {
 
@@ -147,7 +151,7 @@ var ANSI = function() {
 								cursor.x = 0;
 							} */
 							for(var y = 0; y < 24; y++) {
-								for(var x = 0; x < 79; x++) {
+								for(var x = 0; x < 80; x++) {
 									this.data.push(
 										{	'cursor' : {
 												'x' : x,
@@ -222,6 +226,8 @@ var ANSI = function() {
 					}
 				}	
 			}
+			width = lastColumn;
+			height = lastLine;
 			return ret;
 		}
 	);
@@ -327,12 +333,10 @@ var ANSI = function() {
 	var toGraphic = function(options) {
 		var matrix = self.matrix;
 
-		if(typeof options.filename != "string")
-			throw "ANSI: toGraphic: options.filename must be specified, must be string.";
-
 		if(options.GIF) {
-			var encoder = new GIFEncoder(720, 384);
-			encoder.createReadStream().pipe(fs.createWriteStream(options.filename));
+//			var encoder = new GIFEncoder(720, 384);
+			var encoder = new GIFEncoder((9 * width), (16 * height));
+			var rs = encoder.createReadStream();
 			encoder.start();
 			encoder.setRepeat(
 				(typeof options.loop != "boolean" || !options.loop) ? -1 : 0
@@ -350,7 +354,7 @@ var ANSI = function() {
 					? 10 : Math.round(options.charactersPerFrame);
 		}
 
-		var canvas = new ansiCanvas();
+		var canvas = new ansiCanvas((9 * width), (16 * height));
 
 		for(var d = 0; d < self.data.length; d++) {
 			if(self.data[d].chr.match(/\r|\n/) !== null)
@@ -369,31 +373,29 @@ var ANSI = function() {
 			encoder.setDelay(10000); // Dwell on the last frame for a while.  Make configurable?
 			encoder.addFrame(canvas.context);
 			encoder.finish();
+			return rs.read();
 		}
 		if(options.PNG)
-			fs.writeFileSync(options.filename, canvas.canvas.toBuffer());
+			return canvas.canvas.toBuffer();
 	}
 
 	this.toGIF = function(options) {
+		if(typeof options != "object")
+			options = {};
 		options.GIF = true;
 		options.PNG = false;
-		toGraphic(options);
+		return toGraphic(options);
 	}
 
 	this.toPNG = function(filename) {
-		toGraphic(
-			{	'GIF' : false,
-				'PNG' : true,
-				'filename' : filename
-			}
-		);
+		return toGraphic({ 'GIF' : false, 'PNG' : true });
 	}
 
 }
 
 // Lazily ported and modified from my old HTML5 ANSI editor
 // Could be simplified and folded into ANSI.toGIF() at some point
-var ansiCanvas = function() {
+var ansiCanvas = function(width, height) {
 
 	var foregroundCanvas,
 		foregroundContext,
@@ -462,15 +464,15 @@ var ansiCanvas = function() {
 
 	var initCanvas = function() {
 
-		backgroundCanvas = new Canvas(720, 384);
+		backgroundCanvas = new Canvas(width, height);
 		backgroundContext = backgroundCanvas.getContext('2d');
 		backgroundContext.fillStyle = properties.colors[0];
-		backgroundContext.fillRect(0, 0, 720, 384);
+		backgroundContext.fillRect(0, 0, width, height);
 
-		foregroundCanvas = new Canvas(720, 384);
+		foregroundCanvas = new Canvas(width, height);
 		foregroundContext = foregroundCanvas.getContext('2d');
 
-		mergeCanvas = new Canvas(720, 384);
+		mergeCanvas = new Canvas(width, height);
 		mergeContext = mergeCanvas.getContext('2d');
 
 	}

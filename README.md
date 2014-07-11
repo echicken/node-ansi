@@ -1,11 +1,11 @@
 node-ansi
 =========
 
-ANSI graphics parser for node.js.  Output to plain text, HTML, binary, animated GIF, or whatever you want.
+ANSI graphics parser for node.js.  Output to plain text, HTML, binary, animated GIF, PNG, or whatever you want.
 
 ####Installation
 
-GIF output functionality uses [gifencoder](https://github.com/eugeneware/gifencoder) and [node-canvas](https://github.com/Automattic/node-canvas), which in turn rely on [Cairo](http://cairographics.org/).  Ensure that Cairo and its dependencies are installed before proceeding.
+GIF output functionality uses [gifencoder](https://github.com/eugeneware/gifencoder) and [node-canvas](https://github.com/Automattic/node-canvas), which in turn rely on [Cairo](http://cairographics.org/).  Ensure that Cairo and its dependencies are installed before proceeding.  On Ubuntu I've also needed to install libjpeg-dev and libgif-dev in order to install these modules.
 
 I'll add this to NPM eventually.  In the meantime, clone this repository to a subdirectory of your application's *node_modules* directory, cd to its path, and type:
 
@@ -35,13 +35,16 @@ fs.writeFileSync(
 	{ 'encoding' : 'binary' }
 );
 
-// Write the CGA binary version of the graphic to a file
+// Write the binary version of the graphic to a file
 fs.writeFileSync("gnome.bin", a.binary.data);
 // Report the width of the binary graphic, required by ANSI editors
 console.log("Binary graphic width: %d", a.binary.width);
 
-// Save the animated GIF version of the graphic to a file
-a.toGIF({ 'filename' : "gnome.gif", 'loop' : false });
+// Save the looping, animated GIF version of the graphic to a file
+fs.writeFileSync("gnome.gif", a.toGIF({ 'loop' : true }));
+
+// Save the PNG version of the graphic to a file
+fs.writeFileSync("gnome.png", a.toPNG());
 ```
 
 #### The ANSI object
@@ -52,11 +55,9 @@ a.toGIF({ 'filename' : "gnome.gif", 'loop' : false });
 	- Loads and parses an ANSI graphic from a file
 - **fromString(ansiString)**
 	- Loads and parses an ANSI graphic from a string
-- **toGIF(options)**
-	- Converts the loaded ANSI graphic to an animated GIF, and saves it to a file
+- **toGIF(options)** (Buffer)
+	- Converts the loaded ANSI graphic to an animated GIF
 	- *options* is an object with the following properties:
-		- *filename* (string) (required)
-			- The path and filename to save the GIF to
 		- *loop* (boolean) (default: false)
 			- Whether or not the GIF should loop infinitely
 		- *delay* (number) (default: 40)
@@ -71,9 +72,10 @@ a.toGIF({ 'filename' : "gnome.gif", 'loop' : false });
 			- The image quality, on a scale of 1 to 20, where 1 is best and 20 is worst
 				- I haven't noticed a visible difference between 1 and 20
 				- GIFs generate a lot faster when the quality is set to the lowest (yet highest-numbered) value
-- **toPNG(filename)**
-	- Converts the loaded ANSI graphic to a PNG, and saves it to a file
-	- *filename* is the path to the file to save in
+		- Returns a Buffer object
+- **toPNG()** (Buffer)
+	- Converts the loaded ANSI graphic to a PNG
+	- Returns a Buffer object
 
 #####Properties
 

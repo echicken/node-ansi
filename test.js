@@ -11,5 +11,5 @@ fs.writeFileSync(
 );
 fs.writeFileSync("gnome.bin", a.binary.data);
 console.log("Binary graphic width: %d", a.binary.width);
-a.toGIF({ 'filename' : "gnome.gif", 'loop' : false });
-a.toPNG("gnome.png");
+fs.writeFileSync("gnome.gif", a.toGIF({ 'loop' : true }));
+fs.writeFileSync("gnome.png", a.toPNG());
