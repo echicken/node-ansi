@@ -5,7 +5,7 @@ ANSI graphics parser for node.js.  Output to plain text, HTML, binary, animated 
 
 ####Installation
 
-GIF output functionality uses [gifencoder](https://github.com/eugeneware/gifencoder) and [node-canvas](https://github.com/Automattic/node-canvas), which in turn rely on [Cairo](http://cairographics.org/).  Ensure that Cairo and its dependencies are installed before proceeding.
+GIF output functionality uses [gifencoder](https://github.com/eugeneware/gifencoder) and [node-canvas](https://github.com/Automattic/node-canvas), which in turn rely on [Cairo](http://cairographics.org/).  Ensure that Cairo and its dependencies are installed before proceeding.  On Ubuntu I've also needed to install libjpeg-dev and libgif-dev in order to install these modules.
 
 I'll add this to NPM eventually.  In the meantime, clone this repository to a subdirectory of your application's *node_modules* directory, cd to its path, and type:
 
