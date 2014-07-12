@@ -490,8 +490,8 @@ var ansiCanvas = function(width, height) {
 		foregroundContext.clearRect(
 			x,
 			y,
-			properties.spriteWidth,
-			properties.spriteHeight
+			properties.spriteWidth - 1,
+			properties.spriteHeight - 1
 		);
 
 		foregroundContext.drawImage(
