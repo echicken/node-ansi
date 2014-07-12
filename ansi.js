@@ -490,20 +490,20 @@ var ansiCanvas = function(width, height) {
 		foregroundContext.clearRect(
 			x,
 			y,
-			properties.spriteWidth - 1,
-			properties.spriteHeight - 1
+			properties.spriteWidth,
+			properties.spriteHeight
 		);
 
 		foregroundContext.drawImage(
 			properties.spriteSheet,
 			properties.characters[character].x,
 			properties.characters[character].y,
-			properties.spriteWidth - 1,
-			properties.spriteHeight - 1,
+			properties.spriteWidth,
+			properties.spriteHeight,
 			x,
 			y,
-			properties.spriteWidth - 1,
-			properties.spriteHeight - 1
+			properties.spriteWidth,
+			properties.spriteHeight
 		);
 
 		foregroundContext.globalCompositeOperation = 'source-atop';
