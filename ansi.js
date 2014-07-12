@@ -275,7 +275,7 @@ var ANSI = function() {
 			}
 
 			var lines = [
-				'<pre style="font-family: Courier New, Courier, monospace; font-style: normal; font-weight: normal; letter-spacing: -1px; line-height: 99%;">',
+				'<pre style="font-family: Courier New, Courier, monospace; font-style: normal; font-weight: normal; letter-spacing: -1px;">',
 				graphicsToSpan(graphics)
 			];
 
