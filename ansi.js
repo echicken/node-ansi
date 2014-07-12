@@ -301,7 +301,7 @@ var ANSI = function() {
 			
 			lines.push("</span>");
 			lines.push("</pre>\n");
-			return lines.join();
+			return lines.join("\n");
 
 		}
 	);
