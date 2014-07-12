@@ -263,7 +263,7 @@ var ANSI = function() {
 
 			var graphicsToSpan = function(graphics) {
 				var span = util.format(
-					'<div style="background-color: %s; color: %s;">',
+					'<span style="background-color: %s; color: %s;">',
 					defs.Attributes[graphics.background].htmlLow,
 					(graphics.bright)
 						?
@@ -286,7 +286,7 @@ var ANSI = function() {
 					if(matrix[y][x].chr == "\r" || matrix[y][x].chr == "\n")
 						continue;
 					if(!compareObjects(matrix[y][x].graphics, graphics)) {
-						line += "</div>" + graphicsToSpan(matrix[y][x].graphics);
+						line += "</span>" + graphicsToSpan(matrix[y][x].graphics);
 						graphics = copyObject(matrix[y][x].graphics);
 					}
 					line +=
@@ -299,7 +299,7 @@ var ANSI = function() {
 				lines.push(line);
 			}
 			
-			lines.push("</div>");
+			lines.push("</span>");
 			lines.push("</pre>\n");
 			return lines.join("\n");
 
