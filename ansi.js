@@ -275,7 +275,7 @@ var ANSI = function() {
 			}
 
 			var lines = [
-				'<pre style="font-family: Courier New, Courier, monospace; font-style: normal; font-weight: normal;">',
+				'<pre style="font-family: Courier New, Courier, monospace; font-style: normal; font-weight: normal; letter-spacing: -1px; line-height: 99%;">',
 				graphicsToSpan(graphics)
 			];
 
@@ -301,7 +301,7 @@ var ANSI = function() {
 			
 			lines.push("</span>");
 			lines.push("</pre>\n");
-			return lines.join("\n");
+			return lines.join();
 
 		}
 	);
