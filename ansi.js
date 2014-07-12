@@ -479,11 +479,11 @@ var ansiCanvas = function(width, height) {
 
 	this.putCharacter = function(x, y, character, foregroundColor, backgroundColor) {
 
-		x = Math.round(
+		x = Math.floor(
 			(x * properties.spriteWidth) / properties.spriteWidth
 		) * properties.spriteWidth;
 
-		y = Math.round(
+		y = Math.floor(
 			(y * properties.spriteHeight) / properties.spriteHeight
 		) * properties.spriteHeight;
 
