@@ -214,8 +214,7 @@ var ANSI = function() {
 					ret[self.data[d].cursor.y] = {};
 				ret[self.data[d].cursor.y][self.data[d].cursor.x] = {
 					'graphics' : copyObject(self.data[d].graphics),
-//					'chr' : self.data[d].chr
-					'chr' : (self.data[d].chr.match(/\r|\n/) === null) ? self.data[d].chr : " "
+					'chr' : (self.data[d].chr.match(/\r|\n/) === null) ? self.data[d].chr : String.fromCharCode(219)
 				};
 			}
 			for(var y = 0; y <= lastLine; y++) {
