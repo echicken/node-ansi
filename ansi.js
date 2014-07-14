@@ -81,10 +81,10 @@ var ANSI = function() {
 							cursor.x = 0;
 							cursor.y++;
 						}
+						this.data.push(chr);
 						break;
 				}
 				ansiString = ansiString.substr(1);
-				this.data.push(chr);
 			} else {
 				var ansiSequence = ansiString.substr(0, result[0].length).replace(/^\u001b\[/, "");
 				var cmd = ansiSequence.substr(ansiSequence.length - 1);
