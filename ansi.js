@@ -214,10 +214,11 @@ var ANSI = function() {
 					ret[self.data[d].cursor.y] = {};
 				ret[self.data[d].cursor.y][self.data[d].cursor.x] = {
 					'graphics' : copyObject(self.data[d].graphics),
-					'chr' : self.data[d].chr
+//					'chr' : self.data[d].chr
+					'chr' : (self.data[d].chr.match(/\r|\n/) === null) ? self.data[d].chr : " "
 				};
 			}
-			for(var y = lastLine; y >= 0; y--) {
+			for(var y = 0; y <= lastLine; y++) {
 				if(typeof ret[y] == "undefined")
 					ret[y] = {};
 				for(var x = 0; x <= lastColumn; x++) {
