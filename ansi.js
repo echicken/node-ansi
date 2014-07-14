@@ -375,11 +375,11 @@ var ANSI = function() {
 	this.toPNG = function() {
 		var matrix = self.matrix;
 		var canvas = new ansiCanvas((9 * (width + 1)), (16 * (height + 1)));
-		for(var y in self.matrix) {
-			for(var x in self.matrix[y]) {
+		for(var y in matrix) {
+			for(var x in matrix[y]) {
 				canvas.putCharacter(
-					parseInt(y),
-					parseInt(x),
+					x,
+					y,
 					matrix[y][x].chr.charCodeAt(0),
 					defs.Attributes[matrix[y][x].graphics.foreground]|((matrix[y][x].graphics.bright)?defs.Attributes[1].attribute:0),
 					(defs.Attributes[matrix[y][x].graphics.background].attribute>>4)
