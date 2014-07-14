@@ -326,8 +326,6 @@ var ANSI = function() {
 		}
 	);
 
-	// 'width' and 'height' should be determined at parse time rather than
-	// in the 'matrix' getter.
 	this.toGIF = function(options) {
 		var options = (typeof options == "undefined") ? {} : options;
 		var encoder = new GIFEncoder((9 * width), (16 * height));
@@ -373,6 +371,8 @@ var ANSI = function() {
 		var canvas = new ansiCanvas((9 * (width + 1)), (16 * (height + 1)));
 		for(var y in matrix) {
 			for(var x in matrix[y]) {
+				if(matrix[y][x].chr == " " && matrix[y][x].graphics.background == 40)
+					continue;
 				canvas.putCharacter(
 					x,
 					y,
