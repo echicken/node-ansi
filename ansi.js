@@ -109,11 +109,7 @@ var ANSI = function() {
 					case 'C':
 						if(isNaN(opts[0]))
 							opts[0] = 1;
-//						cursor.x = Math.min(cursor.x + opts[0], 79);
-						var x = cursor.x + opts[0];
-						if(x > 79)
-							cursor.y = cursor.y + Math.floor(x / 79);
-						cursor.x = x % 80;
+						cursor.x = Math.min(cursor.x + opts[0], 79);
 						break;
 					case 'D':
 						if(isNaN(opts[0]))
@@ -121,12 +117,12 @@ var ANSI = function() {
 						cursor.x = Math.max(cursor.x - opts[0], 0);
 						break;
 					case 'f':
-						cursor.y = opts[0];
-						cursor.x = opts[1];
+						cursor.y = (isNaN(opts[0])) ? 1 : opts[0];
+						cursor.x = (opts.length < 2) ? 1 : opts[1];
 						break;
 					case 'H':
-						cursor.y = opts[0];
-						cursor.x = opts[1];
+						cursor.y = (isNaN(opts[0])) ? 1 : opts[0];
+						cursor.x = (opts.length < 2) ? 1 : opts[1];
 						break;
 					case 'm':
 						for(var o in opts) {
