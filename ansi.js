@@ -60,7 +60,8 @@ var ANSI = function() {
 		};
 
 		while(ansiString.length > 0) {
-			var regex = /^\u001b\[(\d*;?)(\d*;?)\d*[a-zA-Z]/;
+//			var regex = /^\u001b\[(\d*;?)(\d*;?)\d*[a-zA-Z]/;
+			var regex = /^\u001b\[(\d*;?)*[a-zA-Z]/;
 			var result = regex.exec(ansiString);
 			if(result === null) {
 				var chr = {
