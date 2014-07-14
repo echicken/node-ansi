@@ -336,6 +336,8 @@ var ANSI = function() {
 
 	// It would actually be faster to split GIF and PNG conversion up again,
 	// basing the GIF on self.data and the PNG on self.matrix.
+	// 'width' and 'height' should be determined at parse time rather than
+	// in the 'matrix' getter.
 	var toGraphic = function(options) {
 		var matrix = self.matrix;
 
