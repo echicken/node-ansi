@@ -358,11 +358,9 @@ var ANSI = function() {
 					? 10 : Math.round(options.charactersPerFrame);
 		}
 
-		var canvas = new ansiCanvas((9 * width), (16 * height));
+		var canvas = new ansiCanvas((9 * (width + 1)), (16 * (height + 1)));
 
 		for(var d = 0; d < self.data.length; d++) {
-			if(self.data[d].chr.match(/\r|\n/) !== null)
-				continue;
 			canvas.putCharacter(
 				self.data[d].cursor.x,
 				self.data[d].cursor.y,
