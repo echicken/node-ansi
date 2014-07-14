@@ -336,6 +336,7 @@ var ANSI = function() {
 	);
 
 	var toGraphic = function(options) {
+		var matrix = self.matrix;
 
 		if(options.GIF) {
 			var encoder = new GIFEncoder((9 * width), (16 * height));
