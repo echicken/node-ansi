@@ -283,8 +283,6 @@ var ANSI = function() {
 			for(var y in matrix) {
 				var line = "";
 				for(var x in matrix[y]) {
-					if(matrix[y][x].chr == "\r" || matrix[y][x].chr == "\n")
-						continue;
 					if(!compareObjects(matrix[y][x].graphics, graphics)) {
 						line += "</span>" + graphicsToSpan(matrix[y][x].graphics);
 						graphics = copyObject(matrix[y][x].graphics);
@@ -314,8 +312,6 @@ var ANSI = function() {
 			var width = 0;
 			for(var y in matrix) {
 				for(var x in matrix[y]) {
-					if(matrix[y][x].chr.match(/\r|\n/) !== null)
-						continue;
 					width = Math.max(x, width);
 					bin.push(matrix[y][x].chr.charCodeAt(0));
 					bin.push(
