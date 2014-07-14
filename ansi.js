@@ -112,7 +112,7 @@ var ANSI = function() {
 //						cursor.x = Math.min(cursor.x + opts[0], 79);
 						var x = cursor.x + opts[0];
 						if(x > 79)
-							cursor.y++;
+							cursor.y = cursor.y + Math.floor(x / 79);
 						cursor.x = x % 80;
 						break;
 					case 'D':
