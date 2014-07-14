@@ -97,15 +97,23 @@ var ANSI = function() {
 				ansiString = ansiString.substr(result[0].length);
 				switch(cmd) {
 					case 'A':
+						if(isNaN(opts[0]))
+							opts[0] = 1;
 						cursor.y = Math.max(cursor.y - opts[0], 0);
 						break;
 					case 'B':
+						if(isNaN(opts[0]))
+							opts[0] = 1;
 						cursor.y = cursor.y + opts[0];
 						break;
 					case 'C':
+						if(isNaN(opts[0]))
+							opts[0] = 1;
 						cursor.x = Math.min(cursor.x + opts[0], 79);
 						break;
 					case 'D':
+						if(isNaN(opts[0]))
+							opts[0] = 1;
 						cursor.x = Math.max(cursor.x - opts[0], 0);
 						break;
 					case 'f':
