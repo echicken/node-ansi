@@ -214,7 +214,7 @@ var ANSI = function() {
 					ret[self.data[d].cursor.y] = {};
 				ret[self.data[d].cursor.y][self.data[d].cursor.x] = {
 					'graphics' : copyObject(self.data[d].graphics),
-					'chr' : (self.data[d].chr.match(/\r|\n/) === null) ? self.data[d].chr : String.fromCharCode(219)
+					'chr' : self.data[d].chr
 				};
 			}
 			for(var y = 0; y <= lastLine; y++) {
@@ -247,11 +247,8 @@ var ANSI = function() {
 			var matrix = self.matrix;
 			for(var y in matrix) {
 				var line = "";
-				for(var x in matrix[y]) {
-					if(matrix[y][x].chr == "\r" || matrix[y][x].chr == "\n")
-						continue;
+				for(var x in matrix[y])
 					line += matrix[y][x].chr;
-				}
 				lines.push(line);
 			}
 			return lines.join("\r\n") + "\r\n";
