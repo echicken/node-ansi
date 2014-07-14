@@ -191,6 +191,8 @@ var ANSI = function() {
 						break;
 				}
 			}
+			width = Math.max(cursor.x, width);
+			height = Math.max(cursor.y, height);
 		}
 
 	}
@@ -204,11 +206,7 @@ var ANSI = function() {
 		"matrix",
 		function() {
 			var ret = {};
-			var lastColumn = 0;
-			var lastLine = 0;
 			for(var d = 0; d < self.data.length; d++) {
-				lastLine = Math.max(self.data[d].cursor.y, lastLine);
-				lastColumn = Math.max(self.data[d].cursor.x, lastColumn);
 				if(typeof ret[self.data[d].cursor.y] == "undefined")
 					ret[self.data[d].cursor.y] = {};
 				ret[self.data[d].cursor.y][self.data[d].cursor.x] = {
@@ -216,10 +214,10 @@ var ANSI = function() {
 					'chr' : self.data[d].chr
 				};
 			}
-			for(var y = 0; y <= lastLine; y++) {
+			for(var y = 0; y <= height; y++) {
 				if(typeof ret[y] == "undefined")
 					ret[y] = {};
-				for(var x = 0; x <= lastColumn; x++) {
+				for(var x = 0; x <= width; x++) {
 					if(typeof ret[y][x] != "undefined")
 						continue;
 					ret[y][x] = {
@@ -231,10 +229,8 @@ var ANSI = function() {
 						},
 						'chr' : " "
 					}
-				}	
+				}
 			}
-			width = lastColumn;
-			height = lastLine;
 			return ret;
 		}
 	);
@@ -334,32 +330,28 @@ var ANSI = function() {
 		}
 	);
 
-	// It would actually be faster to split GIF and PNG conversion up again,
-	// basing the GIF on self.data and the PNG on self.matrix.
 	// 'width' and 'height' should be determined at parse time rather than
 	// in the 'matrix' getter.
-	var toGraphic = function(options) {
-		var matrix = self.matrix;
+	this.toGIF = function(options) {
+		var options = (typeof options == "undefined") ? {} : options;
+		var encoder = new GIFEncoder((9 * width), (16 * height));
+		var rs = encoder.createReadStream();
 
-		if(options.GIF) {
-			var encoder = new GIFEncoder((9 * width), (16 * height));
-			var rs = encoder.createReadStream();
-			encoder.start();
-			encoder.setRepeat(
-				(typeof options.loop != "boolean" || !options.loop) ? -1 : 0
-			);
-			encoder.setDelay(
-				(typeof options.delay != "number")
-					? 40 : Math.round(options.delay)
-			);
-			encoder.setQuality(
-				(typeof options.quality != "number")
-					? 20 : Math.min(20, options.quality)
-			);
-			var frames =
-				(typeof options.charactersPerFrame != "number")
-					? 10 : Math.round(options.charactersPerFrame);
-		}
+		encoder.start();
+		encoder.setRepeat(
+			(typeof options.loop != "boolean" || !options.loop) ? -1 : 0
+		);
+		encoder.setDelay(
+			(typeof options.delay != "number")
+				? 40 : Math.round(options.delay)
+		);
+		encoder.setQuality(
+			(typeof options.quality != "number")
+				? 20 : Math.min(20, options.quality)
+		);
+		var frames =
+			(typeof options.charactersPerFrame != "number")
+				? 10 : Math.round(options.charactersPerFrame);
 
 		var canvas = new ansiCanvas((9 * (width + 1)), (16 * (height + 1)));
 
@@ -371,29 +363,30 @@ var ANSI = function() {
 				defs.Attributes[self.data[d].graphics.foreground].attribute|((self.data[d].graphics.bright)?defs.Attributes[1].attribute:0),
 				(defs.Attributes[self.data[d].graphics.background].attribute>>4)
 			);
-			if(options.GIF && d % frames == 0)
+			if(d % frames == 0)
 				encoder.addFrame(canvas.context);
 		}
-		if(options.GIF) {
-			encoder.setDelay(10000); // Dwell on the last frame for a while.  Make configurable?
-			encoder.addFrame(canvas.context);
-			encoder.finish();
-			return rs.read();
-		}
-		if(options.PNG)
-			return canvas.canvas.toBuffer();
-	}
-
-	this.toGIF = function(options) {
-		if(typeof options != "object")
-			options = {};
-		options.GIF = true;
-		options.PNG = false;
-		return toGraphic(options);
+		encoder.setDelay(10000); // Dwell on the last frame for a while.  Make configurable?
+		encoder.addFrame(canvas.context);
+		encoder.finish();
+		return rs.read();
 	}
 
 	this.toPNG = function(filename) {
-		return toGraphic({ 'GIF' : false, 'PNG' : true });
+		var matrix = self.matrix;
+		var canvas = new ansiCanvas((9 * (width + 1)), (16 * (height + 1)));
+		for(var y in self.matrix) {
+			for(var x in self.matrix[y]) {
+				canvas.putCharacter(
+					y,
+					x,
+					matrix[y][x].chr.charCodeAt(0),
+					defs.Attributes[matrix[y][x].graphics.foreground]|((matrix[y][x].graphics.bright)?defs.Attributes[1].attribute:0),
+					(defs.Attributes[matrix[y][x].graphics.background].attribute>>4)
+				);
+			}
+		}
+		return canvas.canvas.toBuffer();
 	}
 
 }
