@@ -72,14 +72,14 @@ fs.writeFileSync("gnome.png", a.toPNG());
 			- The image quality, on a scale of 1 to 20, where 1 is best and 20 is worst
 				- I haven't noticed a visible difference between 1 and 20
 				- GIFs generate a lot faster when the quality is set to the lowest (yet highest-numbered) value
-		- Returns a Buffer object
+	- Returns a Buffer object
 - **toPNG()** (Buffer)
 	- Converts the loaded ANSI graphic to a PNG
 	- Returns a Buffer object
 
 #####Properties
 
-- **data**
+- **data** (Array)
 	- An array of objects representing each explicitly drawn character in the graphic
 	- Elements in this array appear in the sequence that they were parsed from the file
 		- The parser handles cursor-positioning sequences
@@ -102,7 +102,7 @@ fs.writeFileSync("gnome.png", a.toPNG());
 	chr : *string*				// The character itself
 }
 ```
-- **matrix**
+- **matrix** (Object)
 	- An object representing every character-cell in the graphic, from top to bottom, left to right
 	- The object takes the following format:
 
@@ -123,17 +123,17 @@ fs.writeFileSync("gnome.png", a.toPNG());
 }
 ```
 
-- **plainText**
+- **plainText** (String)
 	- A string representation of the graphic with all colour/bright/blink attributes removed, with line-endings in place
 		- (ie. the ANSI graphic converted to boring text.)
 
-- **binary**
+- **binary** (Object)
 	- An object with the following properties:
 		- **width** (number)
 			- The width of the binary graphic
 		- **data** (Buffer)
 			- A buffer of [ chr, attr, chr, attr, ... ] uint8s
 
-- **HTML**
+- **HTML** (String)
 	- An HTML &lt;pre&gt; block containing the graphic, with colorized regions in styled &lt;span&gt; elements, and characters encoded as HTML entities as required
 		- Opening and closing &lt;html&gt; &lt;head&gt; and &lt;body&gt; tags are not included in this string

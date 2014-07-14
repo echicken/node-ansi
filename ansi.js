@@ -4,7 +4,6 @@ var util = require('util'),
 	Image = Canvas.Image,
 	GIFEncoder = require('gifencoder'),
 	defs = require('./defs.js');
-;
 
 var copyObject = function(obj) {
 	var ret = {};
@@ -335,6 +334,8 @@ var ANSI = function() {
 		}
 	);
 
+	// It would actually be faster to split GIF and PNG conversion up again,
+	// basing the GIF on self.data and the PNG on self.matrix.
 	var toGraphic = function(options) {
 		var matrix = self.matrix;
 
