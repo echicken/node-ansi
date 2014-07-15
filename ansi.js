@@ -1,5 +1,7 @@
 var util = require('util'),
 	fs = require('fs'),
+	spawn = require('child_process').spawn,
+	events = require('events'),
 	Canvas = require('canvas'),
 	Image = Canvas.Image,
 	GIFEncoder = require('gifencoder'),
@@ -32,10 +34,39 @@ var compareObjects = function(obj1, obj2) {
 var ANSI = function() {
 
 	var self = this;
-	this.data = [];
+	events.EventEmitter.call(this);
 
+	this.data = [];
 	var width = 0;
 	var height = 0;
+
+	this.__defineGetter__(
+		"width",
+		function() {
+			return width + 1;
+		}
+	);
+
+	this.__defineGetter__(
+		"height",
+		function() {
+			return height + 1;
+		}
+	);
+
+	this.__defineGetter__(
+		"pixelWidth",
+		function() {
+			return (9 * (width + 1));
+		}
+	);
+
+	this.__defineGetter__(
+		"pixelHeight",
+		function() {
+			return (16 * (height + 1));
+		}
+	);
 
 	this.fromString = function(ansiString) {
 
@@ -319,16 +350,13 @@ var ANSI = function() {
 					);
 				}
 			}
-			return {
-				'width' : width - 1, // Magic? Needed for PabloDraw, must test with other files.
-				'data' : new Buffer(bin)
-			};
+			return new Buffer(bin);
 		}
 	);
 
 	this.toGIF = function(options) {
 		var options = (typeof options == "undefined") ? {} : options;
-		var encoder = new GIFEncoder((9 * width), (16 * height));
+		var encoder = new GIFEncoder(this.pixelWidth, this.pixelHeight);
 		var rs = encoder.createReadStream();
 
 		encoder.start();
@@ -345,9 +373,9 @@ var ANSI = function() {
 		);
 		var frames =
 			(typeof options.charactersPerFrame != "number")
-				? 10 : Math.round(options.charactersPerFrame);
+				? 8 : Math.round(options.charactersPerFrame);
 
-		var canvas = new ansiCanvas((9 * (width + 1)), (16 * (height + 1)));
+		var canvas = new ansiCanvas(this.pixelWidth, this.pixelHeight);
 
 		for(var d = 0; d < self.data.length; d++) {
 			canvas.putCharacter(
@@ -368,7 +396,7 @@ var ANSI = function() {
 
 	this.toPNG = function() {
 		var matrix = self.matrix;
-		var canvas = new ansiCanvas((9 * (width + 1)), (16 * (height + 1)));
+		var canvas = new ansiCanvas(this.pixelWidth, this.pixelHeight);
 		for(var y in matrix) {
 			for(var x in matrix[y]) {
 				canvas.putCharacter(
@@ -383,7 +411,67 @@ var ANSI = function() {
 		return canvas.canvas.toBuffer();
 	}
 
+	this.toVideo = function(options, callback) {
+
+		if(arguments.length == 1 && typeof options != "function")
+			this.emit("error", "ANSI.toMovie: Invalid callback");
+		else if(arguments.length == 1)
+			var callback = options;
+
+		if(arguments.length > 1 && (typeof options != "object" || typeof callback != "function"))
+			this.emit("error", "ANSI.toMovie: Invalid arguments");
+
+		var movie = new Buffer(0);
+		var canvas = new ansiCanvas(this.pixelWidth, this.pixelHeight);
+
+		var child = spawn(
+			'ffmpeg',
+			[	'-y',
+				'-f', 'image2pipe',
+				'-c:v', 'png',
+				'-r', (typeof options.frameRate != "number") ? 30 : options.frameRate,
+				'-i', 'pipe:0',
+				'-f', (typeof options.format == "undefined") ? "matroska" : options.format,
+				'-filter:v', 'setpts=' + ((typeof options.speed != "number") ? 1 : options.speed) + '*PTS',
+				'pipe:1'
+			]
+		);
+		child.on(
+			"close",
+			function() {
+				callback(movie);
+			}
+		);
+		child.stderr.on(
+			"data",
+			function(data) {
+				console.log(data.toString());
+			}
+		);
+		child.stdout.on(
+			"data",
+			function(data) {
+				movie = Buffer.concat([movie, data]);
+			}
+		);
+
+		for(var d = 0; d < self.data.length; d++) {
+			canvas.putCharacter(
+				self.data[d].cursor.x,
+				self.data[d].cursor.y,
+				self.data[d].chr.charCodeAt(0),
+				defs.Attributes[self.data[d].graphics.foreground].attribute|((self.data[d].graphics.bright)?defs.Attributes[1].attribute:0),
+				(defs.Attributes[self.data[d].graphics.background].attribute>>4)
+			);
+			if(d % ((typeof options.charactersPerFrame != "number") ? 1 : options.charactersPerFrame) == 0)
+				child.stdin.write(canvas.canvas.toBuffer());
+		}
+		child.stdin.write(canvas.canvas.toBuffer());
+		child.stdin.end();
+	}
+
 }
+util.inherits(ANSI, events.EventEmitter);
 
 // Lazily ported and modified from my old HTML5 ANSI editor
 // Could be simplified and folded into ANSI.toGIF() at some point
