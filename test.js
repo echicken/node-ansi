@@ -9,7 +9,12 @@ fs.writeFileSync(
 	"<html><body>" + a.HTML + "</body></html>",
 	{ 'encoding' : 'binary' }
 );
-fs.writeFileSync("gnome.bin", a.binary.data);
-console.log("Binary graphic width: %d", a.binary.width);
-fs.writeFileSync("gnome.gif", a.toGIF({ 'loop' : true }));
+fs.writeFileSync("gnome.bin", a.binary);
 fs.writeFileSync("gnome.png", a.toPNG());
+fs.writeFileSync("gnome.gif", a.toGIF({ 'loop' : true }));
+a.toVideo(
+	{ speed : .13 },
+	function(video) {
+		fs.writeFileSync("gnome.mp4", video);
+	}
+);
