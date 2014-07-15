@@ -431,7 +431,7 @@ var ANSI = function() {
 				'-c:v', 'png',
 				'-r', (typeof options.frameRate != "number") ? 30 : options.frameRate,
 				'-i', 'pipe:0',
-				'-f', (typeof options.format == "undefined") ? "matroska" : options.format,
+				'-f', (typeof options.format == "undefined") ? "webm" : options.format,
 				'-filter:v', 'setpts=' + ((typeof options.speed != "number") ? 1 : options.speed) + '*PTS',
 				'pipe:1'
 			]
