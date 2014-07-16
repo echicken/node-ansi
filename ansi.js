@@ -388,7 +388,7 @@ var ANSI = function() {
 			if(d % frames == 0)
 				encoder.addFrame(canvas.context);
 		}
-		encoder.setDelay(10000); // Dwell on the last frame for a while.  Make configurable?
+		encoder.setDelay(5000); // Dwell on the last frame for a while.  Make configurable?
 		encoder.addFrame(canvas.context);
 		encoder.finish();
 		return rs.read();
