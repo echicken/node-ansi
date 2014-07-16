@@ -373,7 +373,7 @@ var ANSI = function() {
 		);
 		var frames =
 			(typeof options.charactersPerFrame != "number")
-				? 8 : Math.round(options.charactersPerFrame);
+				? 20 : Math.round(options.charactersPerFrame);
 
 		var canvas = new ansiCanvas(this.pixelWidth, this.pixelHeight);
 
@@ -427,6 +427,7 @@ var ANSI = function() {
 		var child = spawn(
 			'ffmpeg',
 			[	'-y',
+				'-loglevel', 'quiet',
 				'-f', 'image2pipe',
 				'-c:v', 'png',
 				'-r', (typeof options.frameRate != "number") ? 30 : options.frameRate,
@@ -463,7 +464,7 @@ var ANSI = function() {
 				defs.Attributes[self.data[d].graphics.foreground].attribute|((self.data[d].graphics.bright)?defs.Attributes[1].attribute:0),
 				(defs.Attributes[self.data[d].graphics.background].attribute>>4)
 			);
-			if(d % ((typeof options.charactersPerFrame != "number") ? 1 : options.charactersPerFrame) == 0)
+			if(d % ((typeof options.charactersPerFrame != "number") ? 20 : options.charactersPerFrame) == 0)
 				child.stdin.write(canvas.canvas.toBuffer());
 		}
 		child.stdin.write(canvas.canvas.toBuffer());

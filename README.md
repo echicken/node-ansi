@@ -68,7 +68,7 @@ a.toVideo(
 			- Whether or not the GIF should loop infinitely
 		- *delay* (number) (default: 40)
 			- Time between frames, in milliseconds
-		- *charactersPerFrame* (number) (default: 10)
+		- *charactersPerFrame* (number) (default: 20)
 			- How many new characters appear in each frame of the GIF
 				- If you set this to 1, the GIF will show the ANSI being drawn one character at a time, which is nice, however ...
 				- If you set this to 1, it will take a long time to generate the GIF
@@ -91,7 +91,7 @@ a.toVideo(
 			- Adjust the playback speed of the video
 				- 0.25 would cause the video to play back four times faster
 				- 2.5 would cause the video to play back two and a half times more slowly
-		- *charactersPerFrame* (number)
+		- *charactersPerFrame* (number) (default: 20)
 			- As in toGIF() above, how many new characters appear in each frame of the video
 			- Ultimately this is another way to adjust the "speed" of the video
 			- Adjusting this value instead of 'speed' usually results in videos being generated more quickly
