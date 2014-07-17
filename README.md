@@ -9,7 +9,7 @@ ANSI graphics parser for node.js.  Output to plain text, HTML, binary, animated 
 npm install ansi-graphics
 ```
 
-GIF output functionality uses [gifencoder](https://github.com/eugeneware/gifencoder) and [node-canvas](https://github.com/Automattic/node-canvas), which in turn rely on [Cairo](http://cairographics.org/).  Ensure that Cairo and its dependencies are installed before proceeding.  On Ubuntu I've also needed to install libjpeg-dev and libgif-dev in order to install these modules.
+GIF, PNG, and video output functionality uses [gifencoder](https://github.com/eugeneware/gifencoder) and [node-canvas](https://github.com/Automattic/node-canvas), which in turn rely on [Cairo](http://cairographics.org/).  Ensure that Cairo and its dependencies are installed before proceeding.  On Ubuntu I've also needed to install libjpeg-dev and libgif-dev in order to install these modules.
 
 [ffmpeg](http://ffmpeg.org/) is not required for installation, however you'll need a recent build of ffmpeg in your PATH in order to use the output-to-video functionality.
 
