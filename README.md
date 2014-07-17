@@ -78,9 +78,16 @@ a.toVideo(
 			- The image quality, on a scale of 1 to 20, where 1 is best and 20 is worst
 				- I haven't noticed a visible difference between 1 and 20
 				- GIFs generate a lot faster when the quality is set to the lowest (yet highest-numbered) value
+		- *scale* (number) (default: 1)
+			- Scale the image to this many times its actual size (.25 would be 25%, 2 would be 200%, etc.)
 	- Returns a Buffer object
-- **toPNG()** (Buffer)
+- **toPNG(options)** (Buffer)
 	- Converts the loaded ANSI graphic to a PNG
+	- *options* is an optional object with the following properties:
+		- *quality* (number) (default: 5)
+			- The image quality, on a scale of 1 - 5, where 1 is best and 5 is worst
+		- *scale* (number) (default: 1)
+			- Scale the image to this many times its actual size (.25 would be 25%, 2 would be 200%, etc.)
 	- Returns a Buffer object
 - **toVideo(options, callback)**
 	- Converts the loaded ANSI graphic to a video
@@ -95,6 +102,8 @@ a.toVideo(
 			- As in toGIF() above, how many new characters appear in each frame of the video
 			- Ultimately this is another way to adjust the "speed" of the video
 			- Adjusting this value instead of 'speed' usually results in videos being generated more quickly
+		- *scale* (number) (default: 1)
+			- Scale the video to this many times the size of the original image (.25 would be 25%, 2 would be 200%, etc.)
 	- *callback* is a required function that will be called with one argument, a Buffer object containing the video
 
 #####Properties

@@ -355,8 +355,16 @@ var ANSI = function() {
 	);
 
 	this.toGIF = function(options) {
-		var options = (typeof options == "undefined") ? {} : options;
-		var encoder = new GIFEncoder(this.pixelWidth, this.pixelHeight);
+
+		if(typeof options != "object")
+			options = {};
+		if(typeof options.scale != "number")
+			options.scale = 1;
+		
+		var encoder = new GIFEncoder(
+			Math.ceil(this.pixelWidth * options.scale),
+			Math.ceil(this.pixelHeight * options.scale)
+		);
 		var rs = encoder.createReadStream();
 
 		encoder.start();
@@ -375,7 +383,11 @@ var ANSI = function() {
 			(typeof options.charactersPerFrame != "number")
 				? 20 : Math.round(options.charactersPerFrame);
 
-		var canvas = new ansiCanvas(this.pixelWidth, this.pixelHeight);
+		var canvas = new ansiCanvas(
+			this.pixelWidth,
+			this.pixelHeight,
+			options.scale
+		);
 
 		for(var d = 0; d < self.data.length; d++) {
 			canvas.putCharacter(
@@ -394,9 +406,16 @@ var ANSI = function() {
 		return rs.read();
 	}
 
-	this.toPNG = function() {
+	this.toPNG = function(options) {
+		if(typeof options != "object")
+			options = {};
 		var matrix = self.matrix;
-		var canvas = new ansiCanvas(this.pixelWidth, this.pixelHeight);
+		var canvas = new ansiCanvas(
+			this.pixelWidth,
+			this.pixelHeight,
+			(typeof options.scale == "number") ? options.scale : 1,
+			(typeof options.quality == "number" && options.quality >= 0 && options.quality <= 4) ? options.quality : 4
+		);
 		for(var y in matrix) {
 			for(var x in matrix[y]) {
 				canvas.putCharacter(
@@ -422,7 +441,11 @@ var ANSI = function() {
 			this.emit("error", "ANSI.toMovie: Invalid arguments");
 
 		var movie = new Buffer(0);
-		var canvas = new ansiCanvas(this.pixelWidth, this.pixelHeight);
+		var canvas = new ansiCanvas(
+			this.pixelWidth,
+			this.pixelHeight,
+			(typeof options.scale == "number") ? options.scale : 1
+		);
 
 		var child = spawn(
 			'ffmpeg',
@@ -476,7 +499,7 @@ util.inherits(ANSI, events.EventEmitter);
 
 // Lazily ported and modified from my old HTML5 ANSI editor
 // Could be simplified and folded into ANSI.toGIF() at some point
-var ansiCanvas = function(width, height) {
+var ansiCanvas = function(width, height, scale, quality) {
 
 	var foregroundCanvas,
 		foregroundContext,
@@ -485,25 +508,11 @@ var ansiCanvas = function(width, height) {
 		mergeCanvas,
 		mergeContext;
 
-	this.__defineGetter__(
-		"canvas",
-		function() {
-			mergeContext.drawImage(backgroundCanvas, 0, 0);
-			mergeContext.drawImage(foregroundCanvas, 0, 0);
-			return mergeCanvas;
-		}
-	);
-
-	this.__defineGetter__(
-		"context",
-		function() {
-			mergeContext.drawImage(backgroundCanvas, 0, 0);
-			mergeContext.drawImage(foregroundCanvas, 0, 0);
-			return mergeContext;
-		}
-	);
-
 	var properties = {
+		'width' : width,
+		'height' : height,
+		'scale' : (typeof scale != "number") ? 1 : scale,
+		'quality' : (typeof quality != "number" || quality < 1 || quality > 5) ? 4 : quality - 1,
 		'characters' : [],
 		'spriteSheet' : new Image(),
 		'spriteWidth' : 9,
@@ -525,8 +534,56 @@ var ansiCanvas = function(width, height) {
 			"#FC54FC",
 			"#FCFC54",
 			"#FFFFFF"
+		],
+		'qualityMap' : [
+			'bilinear',
+			'nearest',
+			'better',
+			'good',
+			'fast'
 		]
 	};
+
+	var merge = function() {
+		mergeContext.drawImage(
+			backgroundCanvas,
+			0,
+			0,
+			properties.width,
+			properties.height,
+			0,
+			0,
+			Math.ceil(properties.width * properties.scale),
+			Math.ceil(properties.height * properties.scale)
+		);
+		mergeContext.drawImage(
+			foregroundCanvas,
+			0,
+			0,
+			properties.width,
+			properties.height,
+			0,
+			0,
+			Math.ceil(properties.width * properties.scale),
+			Math.ceil(properties.height * properties.scale)
+		);
+	}
+
+	this.__defineGetter__(
+		"canvas", 
+		function() {
+			merge();
+			return mergeCanvas;
+		}
+	);
+
+	this.__defineGetter__(
+		"context",
+		function() {
+			merge();
+			return mergeContext;
+		}
+	);
 
 	var initSpriteSheet = function() {
 		properties.spriteSheet.src = "data:image/png;base64,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";
@@ -545,16 +602,18 @@ var ansiCanvas = function(width, height) {
 
 	var initCanvas = function() {
 
-		backgroundCanvas = new Canvas(width, height);
+		backgroundCanvas = new Canvas(properties.width, properties.height);
 		backgroundContext = backgroundCanvas.getContext('2d');
 		backgroundContext.fillStyle = properties.colors[0];
-		backgroundContext.fillRect(0, 0, width, height);
+		backgroundContext.fillRect(0, 0, properties.width, properties.height);
 
-		foregroundCanvas = new Canvas(width, height);
+		foregroundCanvas = new Canvas(properties.width, properties.height);
 		foregroundContext = foregroundCanvas.getContext('2d');
 
-		mergeCanvas = new Canvas(width, height);
+		mergeCanvas = new Canvas(Math.ceil(properties.width * properties.scale), Math.ceil(properties.height * properties.scale));
 		mergeContext = mergeCanvas.getContext('2d');
+		mergeContext.patternQuality = properties.qualityMap[properties.quality];
+		mergeContext.filter = properties.qualityMap[properties.quality];
 
 	}
 
