@@ -210,7 +210,7 @@ var ANSI = function() {
 						break;
 					case 'K':
 						for(var d in this.data) {
-							if(this.data.cursor.y != cursor.y || this.data.cursor.x < cursor.x)
+							if(this.data[d].cursor.y != cursor.y || this.data[d].cursor.x < cursor.x)
 								continue;
 							var o = copyObject(this.data[d]);
 							o.chr = " ";
